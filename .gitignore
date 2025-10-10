@@ -1,24 +1,9 @@
-# Python
 __pycache__/
 *.py[cod]
 *$py.class
 
-# IDE
-.vscode/
-.idea/
-
-# Virtual Environment
 venv/
 ENV/
 
-# Logs and cache
-logs/
-cache/
-
-# Browser drivers
-chromedriver*
-geckodriver*
-
-# Other
 .DS_Store
 Thumbs.db
