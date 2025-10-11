@@ -70,9 +70,7 @@ class TestRegistration:
         name_input = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.XPATH, StellarBurgersLocators.NAME_INPUT))
         )
-        email_input = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.XPATH, StellarBurgersLocators.EMAIL_INPUT))
-        )
+        email_input = driver.find_element(By.XPATH, StellarBurgersLocators.EMAIL_INPUT)
         password_input = driver.find_element(By.XPATH, StellarBurgersLocators.PASSWORD_INPUT)
         register_button = driver.find_element(By.XPATH, StellarBurgersLocators.REGISTER_SUBMIT_BUTTON)
 
@@ -82,6 +80,7 @@ class TestRegistration:
 
         register_button.click()
 
+        # Проверяем, что появилась ошибка
         error_message = WebDriverWait(driver, 10).until(
             EC.visibility_of_element_located((By.XPATH, StellarBurgersLocators.ERROR_MESSAGE))
         )

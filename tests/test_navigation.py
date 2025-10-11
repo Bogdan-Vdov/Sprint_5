@@ -60,7 +60,7 @@ class TestNavigation:
         account_link = driver.find_element(By.XPATH, StellarBurgersLocators.ACCOUNT_LINK)
         account_link.click()
 
-        # Ждем переход на /login
+        # Ждем перехода на /login
         WebDriverWait(driver, 10).until(
             EC.url_contains("/login")
         )
