@@ -27,3 +27,7 @@ class StellarBurgersLocators:
     BUNS_TAB = "//span[text()='Булки']"
     SAUCES_TAB = "//span[text()='Соусы']"
     FILLINGS_TAB = "//span[text()='Начинки']"
+
+    # Дополнительные локаторы
+    LOGIN_LINK_IN_REGISTRATION_FORM = "//a[text()='Войти']"
+    LOGIN_LINK_IN_FORGOT_PASSWORD_FORM = "//a[text()='Войти']"
