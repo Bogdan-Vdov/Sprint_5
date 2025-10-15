@@ -1,6 +1,6 @@
 # tests/test_navigation.py
 
-import pytest # Не забываем импортировать pytest для фикстур
+import pytest
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -11,27 +11,31 @@ import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
-from urls import BASE_URL
+from urls import ACCOUNT_URL, BASE_URL, LOGIN_URL, REGISTER_URL
 from locators import StellarBurgersLocators
 from helpers import generate_email, generate_password
 
 class TestNavigation:
-
+    """
+    Тесты для проверки навигации по сайту.
+    """
 
     def test_go_to_personal_account(self, driver):
-  
+        """
+        Проверяет переход в личный кабинет через регистрацию и вход.
+        """
         # Arrange & Act: Открытие страницы регистрации
-        driver.get(f"{BASE_URL}/register")
+        driver.get(REGISTER_URL)
         # Очистка куки для гарантии "чистого" состояния
         driver.delete_all_cookies()
         # Повторный переход для уверенности, что куки очищены
-        driver.get(f"{BASE_URL}/register")
+        driver.get(REGISTER_URL)
 
         # Явное ожидание загрузки формы регистрации
-        WebDriverWait(driver, 15).until( # Увеличен таймаут
+        WebDriverWait(driver, 15).until(
             EC.presence_of_element_located((By.XPATH, StellarBurgersLocators.REGISTRATION_FORM))
         )
-        
+
         # Assert: Проверка наличия формы и полей
         name_input = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.XPATH, StellarBurgersLocators.NAME_INPUT))
@@ -54,32 +58,10 @@ class TestNavigation:
         # Отправка формы
         register_submit_button.click()
 
-        # Ожидание перехода на главную или появления сообщения о заказе
-        # Сайт может показать "Ваш заказ начали готовить"
-        try:
-            WebDriverWait(driver, 15).until(
-                 EC.url_to_be(BASE_URL) 
-            )
-            # Если успешно, продолжаем
-        except:
-             # Если URL не изменился, проверим сообщение
-             WebDriverWait(driver, 10).until(
-                 EC.presence_of_element_located((By.XPATH, StellarBurgersLocators.ORDER_IN_PROGRESS_MESSAGE))
-             )
-             assert True 
-             return 
-
-        # Переход в личный кабинет
-        account_link = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, StellarBurgersLocators.ACCOUNT_LINK))
-        )
-        account_link.click()
-
         # Ожидание перехода на страницу логина (если требуется)
         WebDriverWait(driver, 10).until(
-            EC.url_contains("/login")
+                EC.url_to_be(LOGIN_URL)
         )
-
         # Ввод учетных данных для входа
         login_email_input = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.XPATH, StellarBurgersLocators.LOGIN_EMAIL_INPUT))
@@ -91,11 +73,6 @@ class TestNavigation:
         login_password_input.send_keys(password)
         login_button.click()
 
-        # Ожидание перехода на главную после входа
-        WebDriverWait(driver, 10).until(
-            EC.url_to_be(BASE_URL)
-        )
-
         # Переход в личный кабинет снова
         account_link = WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable((By.XPATH, StellarBurgersLocators.ACCOUNT_LINK))
@@ -104,67 +81,68 @@ class TestNavigation:
 
         # Ожидание URL личного кабинета
         WebDriverWait(driver, 10).until(
-            EC.url_contains("/account")
+            EC.url_contains(ACCOUNT_URL)
         )
-        assert "/account" in driver.current_url
+        assert ACCOUNT_URL in driver.current_url
 
     # --- Тесты для конструктора ---
-    # Здесь и далее: Каждый тест проверяет один конкретный сценарий
-    # для обеспечения независимости и корректного отчета о результатах.
+    # Каждый тест проверяет один конкретный сценарий
     def test_constructor_buns(self, driver):
-
+        """
+        Проверяет активность раздела 'Булки' в конструкторе.
+        """
         # Arrange
         driver.get(BASE_URL)
 
-        # Act
+        # Act & Assert: Проверяем Булки
         buns_tab = WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable((By.XPATH, StellarBurgersLocators.BUNS_TAB))
         )
-        # Используем ActionChains для клика
         ActionChains(driver).move_to_element(buns_tab).click().perform()
-        
-        assert "tab_type_current" in buns_tab.get_attribute("class"), "Раздел 'Булки' не стал активным"
+        # Проверка: элемент активен (атрибут class содержит 'tab_tab_type_current')
+        assert "tab_tab_type_current" in buns_tab.get_attribute("class"), "Раздел 'Булки' не активен"
 
     def test_constructor_sauces(self, driver):
-    
+        """
+        Проверяет активность раздела 'Соусы' в конструкторе.
+        """
         # Arrange
         driver.get(BASE_URL)
 
-        # Act
+        # Act & Assert: Проверяем Соусы
         sauces_tab = WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable((By.XPATH, StellarBurgersLocators.SAUCES_TAB))
         )
         ActionChains(driver).move_to_element(sauces_tab).click().perform()
-        
-        # Assert
-        assert "tab_type_current" in sauces_tab.get_attribute("class"), "Раздел 'Соусы' не стал активным"
+        assert "tab_tab_type_current" in sauces_tab.get_attribute("class"), "Раздел 'Соусы' не активен"
 
     def test_constructor_fillings(self, driver):
-     
+        """
+        Проверяет активность раздела 'Начинки' в конструкторе.
+        """
         # Arrange
         driver.get(BASE_URL)
 
-        # Act
+        # Act & Assert: Проверяем Начинки
         fillings_tab = WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable((By.XPATH, StellarBurgersLocators.FILLINGS_TAB))
         )
         ActionChains(driver).move_to_element(fillings_tab).click().perform()
-        
-        # Assert
-        assert "tab_type_current" in fillings_tab.get_attribute("class"), "Раздел 'Начинки' не стал активным"
-        # Здесь и далее: Проверка через атрибут класса, как и в предыдущих тестах.
+        assert "tab_tab_type_current" in fillings_tab.get_attribute("class"), "Раздел 'Начинки' не активен"
 
     def test_logout(self, driver):
-      
+        """
+        Проверяет выход из аккаунта.
+        """
         # Arrange: Регистрация нового пользователя
-        driver.get(f"{BASE_URL}/register")
+        driver.get(REGISTER_URL)
         driver.delete_all_cookies()
-        driver.get(f"{BASE_URL}/register")
+        driver.get(REGISTER_URL)
 
         WebDriverWait(driver, 15).until(
             EC.presence_of_element_located((By.XPATH, StellarBurgersLocators.REGISTRATION_FORM))
         )
-        
+
         name_input = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.XPATH, StellarBurgersLocators.NAME_INPUT))
         )
@@ -182,29 +160,11 @@ class TestNavigation:
         password_input.send_keys(password)
         register_submit_button.click()
 
-        # Ожидание перехода или сообщения
-        try:
-            WebDriverWait(driver, 15).until(
-                 EC.url_to_be(BASE_URL)
-            )
-        except:
-             WebDriverWait(driver, 10).until(
-                 EC.presence_of_element_located((By.XPATH, StellarBurgersLocators.ORDER_IN_PROGRESS_MESSAGE))
-             )
-             assert True
-             return
-
-        # Act: Вход и выход
-        # Переход в ЛК
-        account_link = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, StellarBurgersLocators.ACCOUNT_LINK))
-        )
-        account_link.click()
-
-        # Ожидание и заполнение формы логина
+        # Ожидание перехода на страницу логина (если требуется)
         WebDriverWait(driver, 10).until(
-            EC.url_contains("/login")
+            EC.url_to_be(LOGIN_URL)
         )
+        # Вводим логин и пароль
         login_email_input = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.XPATH, StellarBurgersLocators.LOGIN_EMAIL_INPUT))
         )
@@ -215,21 +175,13 @@ class TestNavigation:
         login_password_input.send_keys(password)
         login_button.click()
 
-        # Ожидание перехода на главную
-        WebDriverWait(driver, 10).until(
-            EC.url_to_be(BASE_URL)
-        )
-
-        # Переход в ЛК снова
+        # Переходим в личный кабинет
         account_link = WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable((By.XPATH, StellarBurgersLocators.ACCOUNT_LINK))
         )
         account_link.click()
 
-        # Ожидание страницы ЛК и выход
-        WebDriverWait(driver, 10).until(
-            EC.url_contains("/account")
-        )
+        # Выходим
         logout_button = WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable((By.XPATH, StellarBurgersLocators.LOGOUT_BUTTON))
         )
@@ -237,6 +189,6 @@ class TestNavigation:
 
         # Assert: Проверка перехода на страницу логина после выхода
         WebDriverWait(driver, 10).until(
-            EC.url_to_be(f"{BASE_URL}/login") 
+            EC.url_to_be(LOGIN_URL) # TODO: Исправить на Urls.py
         )
-        assert "/login" in driver.current_url
+        assert LOGIN_URL in driver.current_url
